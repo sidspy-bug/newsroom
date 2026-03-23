@@ -664,10 +664,6 @@ summarizeBtn.addEventListener("click", async () => {
     showResult(summaryOutput);
     showResult(explanationOutput);
     setStatus(`Summary and ${mode} explanation ready.`, "ok");
-
-    if (mode === "kid") {
-      await playNarration(finalExplanation, true);
-    }
   } catch (err) {
     setStatus(err.message, "error");
   } finally {
@@ -743,13 +739,13 @@ async function playNarration(text, silentStatus = false) {
 }
 
 voiceBtn.addEventListener("click", async () => {
+  if (audioPlayer && !audioPlayer.paused) {
+    stopAllAudioPlayback();
+    setStatus("Voice playback stopped.", "ok");
+    return;
+  }
   const text = latestExplanation || explanationOutput.textContent.trim();
   await playNarration(text, false);
-});
-
-voiceBtn.addEventListener("dblclick", () => {
-  stopAllAudioPlayback();
-  setStatus("Voice playback stopped.", "ok");
 });
 
 if (pauseBtn) {
@@ -803,13 +799,13 @@ async function playSummaryAudio(text) {
 
 if (summarySpeakBtn) {
   summarySpeakBtn.addEventListener("click", async () => {
+    if (summaryAudioPlayer && !summaryAudioPlayer.paused) {
+      stopAllAudioPlayback();
+      setStatus("Summary audio stopped.", "ok");
+      return;
+    }
     const text = summaryOutput.textContent.trim();
     await playSummaryAudio(text);
-  });
-
-  summarySpeakBtn.addEventListener("dblclick", () => {
-    stopAllAudioPlayback();
-    setStatus("Summary audio stopped.", "ok");
   });
 }
 
@@ -862,13 +858,13 @@ async function playExplanationAudio(text) {
 
 if (explanationSpeakBtn) {
   explanationSpeakBtn.addEventListener("click", async () => {
+    if (explanationAudioPlayer && !explanationAudioPlayer.paused) {
+      stopAllAudioPlayback();
+      setStatus("Explanation audio stopped.", "ok");
+      return;
+    }
     const text = latestExplanation || explanationOutput.textContent.trim();
     await playExplanationAudio(text);
-  });
-
-  explanationSpeakBtn.addEventListener("dblclick", () => {
-    stopAllAudioPlayback();
-    setStatus("Explanation audio stopped.", "ok");
   });
 }
 
@@ -999,7 +995,6 @@ function setUserType(type) {
     latestExplanation = transformedStory;
     explanationOutput.textContent = transformedStory;
     renderStorybook(transformedStory);
-    playNarration(transformedStory, true);
   }
 
   if (type !== "kid" && audioPlayer) {
