@@ -163,3 +163,7 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
 - If `GROQ_API_KEY` is missing/invalid, AI endpoints return clear error details.
 - Some IDE warnings about missing imports happen when interpreter is not set to project `.venv`.
 - Kid safety filter is pattern-based and intentionally conservative.
+
+## ▲ Vercel Deployment
+- `vercel.json` routes all traffic (including `/static/**`) to `main.py` so the FastAPI app serves both UI and APIs.
+- Install dependencies from `requirements.txt` so Vercel's Python runtime has FastAPI and supporting packages.
