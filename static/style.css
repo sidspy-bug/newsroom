@@ -2595,7 +2595,7 @@ body::before {
   border: 1px solid rgba(132, 173, 255, 0.4);
   box-shadow: 0 10px 24px rgba(64, 87, 165, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   animation: langGlow 2.8s ease-in-out infinite;
-  overflow: hidden;
+  overflow: visible;
   backdrop-filter: blur(10px);
   transition: transform 0.16s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
