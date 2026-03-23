@@ -2637,7 +2637,7 @@ body::before {
 }
 
 .lang-mini-label {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #c4d9ff;
