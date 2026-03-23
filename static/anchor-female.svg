@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Female news anchor illustration">
+  <rect width="200" height="200" fill="#f5f8ff"/>
+  <circle cx="100" cy="80" r="42" fill="#ffd8c2"/>
+  <path d="M58 79c0-31 18-52 42-52s42 21 42 52c-7-10-18-16-42-16S65 69 58 79z" fill="#4b3f72"/>
+  <circle cx="84" cy="84" r="4" fill="#2d2d2d"/>
+  <circle cx="116" cy="84" r="4" fill="#2d2d2d"/>
+  <path d="M85 101c5 7 25 7 30 0" stroke="#9a4d4d" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M55 170c6-32 25-48 45-48s39 16 45 48" fill="#2f6df6"/>
+  <rect x="75" y="134" width="50" height="32" rx="8" fill="#ffffff"/>
+  <text x="100" y="187" text-anchor="middle" font-size="14" fill="#48608f" font-family="Arial">AI Anchor</text>
+</svg>

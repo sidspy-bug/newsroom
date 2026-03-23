@@ -1,0 +1,46 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Storyteller mascot</title>
+  <desc id="desc">Original friendly cartoon storyteller character with a book.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff9d6"/>
+      <stop offset="100%" stop-color="#ffe2f4"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6fd3ff"/>
+      <stop offset="100%" stop-color="#4f93ff"/>
+    </linearGradient>
+    <linearGradient id="book" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff8bc1"/>
+      <stop offset="100%" stop-color="#ff5ea5"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="256" height="256" rx="42" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="108" fill="#ffffff" fill-opacity="0.45"/>
+
+  <!-- hair -->
+  <path d="M74 95c4-33 27-52 54-52s50 19 54 52c-9-10-20-15-34-15-11 0-23 3-35 3s-23-2-39 12z" fill="#643f29"/>
+
+  <!-- face -->
+  <ellipse cx="128" cy="112" rx="43" ry="40" fill="#ffd8b5"/>
+  <circle cx="112" cy="110" r="5" fill="#3e2c1f"/>
+  <circle cx="144" cy="110" r="5" fill="#3e2c1f"/>
+  <path d="M112 128c8 7 24 7 32 0" stroke="#d36a7a" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="96" cy="120" r="6" fill="#ff9db4" fill-opacity="0.6"/>
+  <circle cx="160" cy="120" r="6" fill="#ff9db4" fill-opacity="0.6"/>
+
+  <!-- body -->
+  <rect x="86" y="148" width="84" height="62" rx="24" fill="url(#shirt)"/>
+  <circle cx="128" cy="164" r="6" fill="#ffffff"/>
+
+  <!-- book -->
+  <rect x="72" y="170" width="112" height="58" rx="10" fill="url(#book)"/>
+  <path d="M128 170v58" stroke="#ffd3e9" stroke-width="3"/>
+  <path d="M88 188h30M88 198h25M138 188h30M138 198h25" stroke="#ffe9f5" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- sparkle stars -->
+  <path d="M40 52l4 10 10 4-10 4-4 10-4-10-10-4 10-4 4-10z" fill="#ffd54f"/>
+  <path d="M210 56l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8z" fill="#ffd54f"/>
+  <path d="M214 186l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8z" fill="#ffd54f"/>
+</svg>

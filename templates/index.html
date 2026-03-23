@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-Native Interactive News Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <!-- Logo -->
+      <div class="navbar-logo">
+        <a href="#" class="logo-link">🚀 AI News</a>
+      </div>
+
+      <!-- Desktop Links -->
+      <div class="navbar-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#docs" class="nav-link">Docs</a>
+        <a href="#blog" class="nav-link">Blog</a>
+      </div>
+
+      <!-- CTA Button (Desktop) -->
+      <button class="navbar-cta" aria-label="Get started">Get Started</button>
+
+      <!-- Hamburger Menu (Mobile) -->
+      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileDrawer" class="mobile-drawer" aria-hidden="true">
+      <div class="drawer-content">
+        <a href="#features" class="drawer-link">Features</a>
+        <a href="#pricing" class="drawer-link">Pricing</a>
+        <a href="#docs" class="drawer-link">Docs</a>
+        <a href="#blog" class="drawer-link">Blog</a>
+        <button class="drawer-cta">Get Started</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="drawerBackdrop" class="drawer-backdrop" aria-hidden="true"></div>
+
+  <!-- User Type Selector Modal -->
+  <div id="userTypeModal" class="user-type-modal" aria-hidden="false">
+    <div class="user-type-panel neo-card">
+      <h2>Select Your Profile</h2>
+      <p>Choose how you'd like to experience the news</p>
+      <div class="user-type-buttons">
+        <button class="user-type-btn" data-user-type="kid">
+          <div class="user-type-icon">👶</div>
+          <div class="user-type-title">Kid</div>
+          <div class="user-type-desc">Fun & Easy</div>
+        </button>
+        <button class="user-type-btn" data-user-type="student">
+          <div class="user-type-icon">🎓</div>
+          <div class="user-type-title">Student</div>
+          <div class="user-type-desc">Clear & Balanced</div>
+        </button>
+        <button class="user-type-btn" data-user-type="professional">
+          <div class="user-type-icon">💼</div>
+          <div class="user-type-title">Professional</div>
+          <div class="user-type-desc">Minimal & Efficient</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <header class="site-header">
+      <div class="header-top">
+        <h1 id="appTitle">AI News Studio</h1>
+        <button id="settingsBtn" class="settings-btn" type="button" aria-label="Settings">⚙️</button>
+      </div>
+      <p id="appSubtitle">Understand news like never before</p>
+      <div class="morning-strip" aria-live="polite">
+        <div class="morning-quote-track" id="morningQuoteTrack">Welcome! Your daily quote will appear here.</div>
+        <div class="morning-datetime" id="morningDateTime">--</div>
+      </div>
+    </header>
+
+    <section class="neo-card input-card">
+      <div class="input-card-head">
+        <h2 id="inputHeading">News Input</h2>
+        <div class="input-card-actions">
+          <div id="cameraQuickMenu" class="camera-quick-menu">
+            <button id="openCameraBtn" class="btn camera-fab" type="button" aria-label="Open scan options" aria-expanded="false">
+              <span class="camera-fab-icon" aria-hidden="true">📷</span>
+            </button>
+            <div id="cameraQuickOptions" class="camera-quick-options" aria-hidden="true">
+              <button id="scanCameraOption" class="btn camera-option-btn" type="button">📷 Scan with Camera</button>
+              <button id="uploadPhotoOption" class="btn camera-option-btn camera-option-upload" type="button">🖼️ Upload Photo</button>
+            </div>
+          </div>
+          <label class="lang-mini-wrap" for="outputLanguage" aria-label="Output language">
+            <span class="lang-mini-icon" aria-hidden="true">🌐</span>
+            <select id="outputLanguage" class="lang-mini-select">
+              <option value="auto" selected>Auto</option>
+              <option value="english">English</option>
+              <option value="hindi">Hindi</option>
+              <option value="spanish">Spanish</option>
+              <option value="french">French</option>
+              <option value="german">German</option>
+              <option value="japanese">Japanese</option>
+              <option value="arabic">Arabic</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <textarea id="newsText" placeholder="Enter or paste news article here..."></textarea>
+      <input id="imageInput" type="file" accept="image/*" class="hidden" />
+      <button id="summarizeBtn" class="btn btn-generate">Generate</button>
+      <div class="meta-row">
+        <span>Words: <strong id="wordCount">0</strong></span>
+        <span>Read Time: <strong id="readTime">0 min</strong></span>
+        <span>Mode: <strong id="selectedMode">None</strong></span>
+      </div>
+    </section>
+
+    <!-- Tabs Section for mode switching -->
+    <div class="tabs-container" id="tabsContainer">
+      <button class="tab-btn active" data-tab="summary">
+        <span class="tab-icon">⭐</span>
+        <span class="tab-label">Summary</span>
+      </button>
+      <button class="tab-btn" data-tab="explanation">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">Explanation</span>
+      </button>
+      <button class="tab-btn" data-tab="story" id="storyModeTab">
+        <span class="tab-icon">🎬</span>
+        <span class="tab-label">Story Mode</span>
+      </button>
+    </div>
+
+    <section class="neo-card" id="summaryCard">
+      <div class="summary-header">
+        <h2>⭐ Summary</h2>
+        <button id="summarySpeakBtn" class="btn summary-speak-btn" type="button" aria-label="Listen to summary">
+          <span class="speak-icon">🔊</span>
+          <span class="speak-label">Listen</span>
+        </button>
+      </div>
+      <pre id="summaryOutput" class="output summary-output">No summary yet.</pre>
+      <audio id="summaryAudioPlayer" class="summary-audio-player"></audio>
+    </section>
+
+    <section class="neo-card" id="explanationCard">
+      <div class="card-top">
+        <div class="explanation-header">
+          <h2 id="explanationHeading">Explanation</h2>
+          <button id="explanationSpeakBtn" class="btn explanation-speak-btn" type="button" aria-label="Listen to explanation">
+            <span class="speak-icon">🔊</span>
+            <span class="speak-label">Listen</span>
+          </button>
+        </div>
+      </div>
+      <div id="storybookView" class="storybook-view" aria-hidden="true">
+        <div class="story-page story-left" id="storyLeftPage">
+          <div class="story-page-label">📖 Page 1</div>
+          <div id="storyLeftText" class="story-text">Your story will appear here.</div>
+        </div>
+        <div class="story-page story-right" id="storyRightPage">
+          <div class="story-page-label">✨ Page 2</div>
+          <div id="storyRightText" class="story-text">Generate to continue the adventure.</div>
+        </div>
+      </div>
+      <pre id="explanationOutput" class="output">No explanation yet.</pre>
+      <audio id="explanationAudioPlayer" class="explanation-audio-player"></audio>
+    </section>
+
+    <section class="neo-card chat-popup" id="chatCard" aria-hidden="true">
+      <div class="chat-head">
+        <h2>Chat</h2>
+        <div class="chat-actions">
+          <button id="clearChatBtn" class="btn btn-ghost" type="button">Clear</button>
+          <button id="closeChatBtn" class="btn btn-ghost" type="button">Close</button>
+        </div>
+      </div>
+      <div class="chat-window" id="chatWindow">
+        <div class="chat-bubble ai">Ask a question about the news to start.</div>
+      </div>
+      <div class="chat-input-row">
+        <input id="questionInput" type="text" placeholder="Ask a question about the news..." />
+        <button id="askBtn" class="btn">Send</button>
+      </div>
+      <pre id="chatOutput" class="output hidden">No chat answer yet.</pre>
+    </section>
+
+    <section class="neo-card anchor-card" id="voiceCard">
+      <img id="anchorImg" src="/static/anchor-female.svg" alt="AI anchor" class="anchor-img" />
+      <div class="story-mode-controls">
+        <button id="voiceBtn" class="btn play-btn story-play-btn" aria-label="Play briefing">
+          <span class="voice-btn-icon" aria-hidden="true">▶️</span>
+          <span id="voiceBtnText">Play Briefing</span>
+        </button>
+        <button id="pauseBtn" class="btn pause-btn story-pause-btn" aria-label="Pause">
+          <span class="pause-icon" aria-hidden="true">⏸️</span>
+          <span>Pause</span>
+        </button>
+      </div>
+      <audio id="audioPlayer" class="audio-player" aria-hidden="true"></audio>
+    </section>
+
+    <!-- BENTO GRID FEATURES SECTION -->
+    <section class="bento-section">
+      <h2 class="bento-title">Platform Features</h2>
+      <div class="bento-grid">
+        <!-- Large Card 1: Real-time sync -->
+        <div class="bento-card bento-card-lg">
+          <div class="bento-icon">⚡</div>
+          <h3 class="bento-headline">Real-time Sync</h3>
+          <p class="bento-description">Updates across all your devices instantly.</p>
+        </div>
+
+        <!-- Large Card 2: Team collaboration -->
+        <div class="bento-card bento-card-lg">
+          <div class="bento-icon">👥</div>
+          <h3 class="bento-headline">Team Collaboration</h3>
+          <p class="bento-description">Share insights and work together seamlessly.</p>
+        </div>
+
+        <!-- Small Card 1: Custom workflows -->
+        <div class="bento-card bento-card-sm">
+          <div class="bento-icon">⚙️</div>
+          <h3 class="bento-headline">Custom Workflows</h3>
+          <p class="bento-description">Build your perfect automation.</p>
+        </div>
+
+        <!-- Small Card 2: Analytics -->
+        <div class="bento-card bento-card-sm">
+          <div class="bento-icon">📊</div>
+          <h3 class="bento-headline">Analytics</h3>
+          <p class="bento-description">Track metrics that matter most.</p>
+        </div>
+
+        <!-- Small Card 3: API access -->
+        <div class="bento-card bento-card-sm">
+          <div class="bento-icon">🔌</div>
+          <h3 class="bento-headline">API Access</h3>
+          <p class="bento-description">Integrate with your favorite tools.</p>
+        </div>
+
+        <!-- Small Card 4: Priority support -->
+        <div class="bento-card bento-card-sm">
+          <div class="bento-icon">🎯</div>
+          <h3 class="bento-headline">Priority Support</h3>
+          <p class="bento-description">Get help when you need it most.</p>
+        </div>
+      </div>
+    </section>
+
+    <p id="status" class="status status-ok">Ready.</p>
+  </main>
+
+  <div id="chatBackdrop" class="chat-backdrop"></div>
+  <button id="chatLauncher" class="chat-launcher" type="button" aria-label="Open chat assistant">
+    🤖
+  </button>
+
+  <div id="cameraModal" class="camera-modal" aria-hidden="true">
+    <div class="camera-panel neo-card">
+      <div class="chat-head">
+        <h2>Scan Newspaper</h2>
+        <button id="closeCameraBtn" class="btn btn-ghost" type="button">Close</button>
+      </div>
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <canvas id="cameraCanvas" class="hidden"></canvas>
+      <div class="scan-actions">
+        <button id="captureBtn" class="btn" type="button">Capture & Extract</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="morningGreetingPopup" class="morning-greeting-popup" aria-hidden="true" role="status">
+    <div class="morning-greeting-title" id="morningGreetingTitle">🌞 Good Morning</div>
+    <div class="morning-greeting-text" id="morningGreetingText">Welcome back.</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
