@@ -224,6 +224,7 @@ class ChatInput(BaseModel):
 	question: str = Field(..., min_length=3)
 	history: list[ChatTurn] = Field(default_factory=list)
 	output_language: Optional[str] = Field(default="auto")
+	mode: Optional[str] = Field(default="student", description="kid | student | professional")
 
 
 class VoiceInput(BaseModel):
@@ -238,6 +239,28 @@ KID_RESTRICTED_PATTERNS = [
 	r"\b(rape|sexual assault|molest(?:ed|ation)?)\b",
 	r"\b(porn|pornograph(?:y|ic)|explicit nudity|nude scene)\b",
 	r"\b(graphic violence|gore|bloodbath)\b",
+	# Mass violence events
+	r"\b(mass shooting|mass murder|mass killing|mass casualty|mass stabbing)\b",
+	r"\b(serial killer|killing spree|murder spree|rampage killing)\b",
+	# Murder and homicide
+	r"\b(murder(?:ed|er|ous|ers)?|homicide|manslaughter)\b",
+	# Shootings
+	r"\b(shoot(?:ing|er|ings|ers)|gunfire|gunshot|shot dead|shot and killed|gunned down|open fire)\b",
+	r"\b(gun(?:man|men|woman|women)|armed attack|drive.by shooting)\b",
+	# Bombing and terrorism
+	r"\b(bomb(?:ing|ings|blast|blasts|ed)?|suicide bomb(?:er|ing)?|car bomb|explosive device)\b",
+	r"\b(terror(?:ist|ists|ism)|terrorist attack|jihad(?:ist)?)\b",
+	# Suicide and self-harm
+	r"\b(suicide|suicidal|self.harm|self harm|took (?:his|her|their) (?:own )?life)\b",
+	# Child exploitation and abuse
+	r"\b(child abuse|child sexual abuse|child exploitation|child trafficking)\b",
+	r"\b(pedophil(?:e|ia|ic)|grooming|sex(?:ual)? exploitation|human trafficking)\b",
+	# Stabbing and bladed attacks
+	r"\b(stab(?:bed|bing|bings)|knife attack|machete attack|sword attack)\b",
+	# Domestic and sexual violence
+	r"\b(domestic violence|domestic abuse|sexual violence|gang rape|sex crime)\b",
+	# Execution and lynching
+	r"\b(execut(?:e|ed|ion)|lynching|lynched|hanging death)\b",
 ]
 
 
@@ -325,6 +348,12 @@ def explain(payload: ExplainInput) -> dict[str, str]:
 
 @app.post("/chat")
 def chat(payload: ChatInput) -> dict[str, str]:
+	mode = (payload.mode or "student").strip().lower()
+	if mode not in {"kid", "student", "professional"}:
+		mode = "student"
+
+	enforce_kid_safety(mode, payload.news_text)
+
 	resolved_language = resolve_output_language(payload.output_language, payload.question)
 	language_instruction = build_language_instruction(
 		resolved_language,
