@@ -236,7 +236,8 @@ KID_RESTRICTED_PATTERNS = [
 	r"\b(behead(?:ed|ing)?|decapitat(?:e|ed|ion))\b",
 	r"\b(dismember(?:ed|ment)?|mutilat(?:e|ed|ion))\b",
 	r"\b(tortur(?:e|ed|ing)|massacre|slaughter)\b",
-	r"\b(rape|sexual assault|molest(?:ed|ation)?)\b",
+	r"\brap(?:e|ed|es|ing|ist[s]?)\b",
+	r"\b(sexual assault|molest(?:ed|ing|ers?|ation)?)\b",
 	r"\b(porn|pornograph(?:y|ic)|explicit nudity|nude scene)\b",
 	r"\b(graphic violence|gore|bloodbath)\b",
 	# Mass violence events
@@ -258,7 +259,7 @@ KID_RESTRICTED_PATTERNS = [
 	# Stabbing and bladed attacks
 	r"\b(stab(?:bed|bing|bings)|knife attack|machete attack|sword attack)\b",
 	# Domestic and sexual violence
-	r"\b(domestic violence|domestic abuse|sexual violence|gang rape|sex crime)\b",
+	r"\b(domestic violence|domestic abuse|sexual violence|gang rap(?:e[ds]?|ing)|sex crime)\b",
 	# Execution and lynching
 	r"\b(execut(?:e|ed|ion)|lynching|lynched|hanging death)\b",
 ]
