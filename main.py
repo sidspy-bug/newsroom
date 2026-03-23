@@ -368,11 +368,16 @@ def voice(payload: VoiceInput) -> dict[str, str]:
 
 @app.get("/audio/{file_name}")
 def get_audio(file_name: str) -> FileResponse:
-	safe_name = Path(file_name).name
-	if safe_name != file_name:
+	lower_name = file_name.lower()
+	if any(sep in file_name for sep in ("/", "\\")) or "%2f" in lower_name or "%5c" in lower_name:
 		raise HTTPException(status_code=400, detail="Invalid file name")
+	if not re.fullmatch(r"voice_[a-f0-9]{32}\.mp3", file_name):
+		raise HTTPException(status_code=400, detail="Invalid file name format")
 
-	file_path = AUDIO_DIR / safe_name
+	file_path = (AUDIO_DIR / file_name).resolve()
+	audio_root = AUDIO_DIR.resolve()
+	if audio_root not in file_path.parents and audio_root != file_path:
+		raise HTTPException(status_code=400, detail="Invalid file path")
 	if not file_path.exists():
 		raise HTTPException(status_code=404, detail="Audio file not found")
 
