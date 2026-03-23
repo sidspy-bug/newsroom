@@ -698,6 +698,7 @@ askBtn.addEventListener("click", async () => {
       question,
       history: chatHistory.slice(-8),
       output_language: selectedLanguage(),
+      mode: userType || activeMode || "student",
     });
     latestResponseLanguage = data.language || latestResponseLanguage;
     removeTypingBubble();
