@@ -278,7 +278,7 @@ def enforce_kid_safety(mode: str, news_text: str) -> None:
 		raise HTTPException(
 			status_code=403,
 			detail=(
-				"This news includes brutal or sexual adult content and cannot be summarized in Kid mode. "
+				"This news includes brutal or sexual adult content and cannot be summarized or explained in Kid mode. "
 				"Please switch to Student or Professional mode."
 			),
 		)
@@ -307,11 +307,20 @@ def summarize(payload: NewsInput) -> dict[str, str]:
 		resolved_language,
 		"Write in the same language as the input news text.",
 	)
-	prompt = (
-		"Summarize the following news into 3-5 bullet points in simple language.\n\n"
-		f"Language instruction: {language_instruction}\n\n"
-		f"News:\n{payload.news_text}"
-	)
+	if mode == "kid":
+		prompt = (
+			"Summarize the following news for kids using 3-5 short, gentle bullet points. "
+			"Focus on positive, helpful, or constructive aspects and skip scary or graphic details. "
+			"After the summary, add a mini section titled 'Learning Points' with 2 upbeat lessons or actions a child can remember.\n\n"
+			f"Language instruction: {language_instruction}\n\n"
+			f"News:\n{payload.news_text}"
+		)
+	else:
+		prompt = (
+			"Summarize the following news into 3-5 bullet points in simple language.\n\n"
+			f"Language instruction: {language_instruction}\n\n"
+			f"News:\n{payload.news_text}"
+		)
 	summary = call_llm(prompt)
 	return {"summary": summary, "language": resolved_language}
 
@@ -330,15 +339,24 @@ def explain(payload: ExplainInput) -> dict[str, str]:
 		"Write in the same language as the input news text.",
 	)
 
-	prompt = (
-		"Explain the following news in {mode}:\n"
-		"- Kid: very simple with examples\n"
-		"- Student: educational and clear\n"
-		"- Professional: detailed and technical\n\n"
-		f"Language instruction: {language_instruction}\n"
-		f"Mode: {mode}\n"
-		f"News:\n{payload.news_text}"
-	)
+	if mode == "kid":
+		prompt = (
+			"Explain the following news as a gentle story for kids. "
+			"Use simple sentences, avoid scary or graphic details, and keep a friendly tone. "
+			"Include 2 short 'Learning Points' that highlight positive takeaways or how kids can think about the news.\n\n"
+			f"Language instruction: {language_instruction}\n"
+			f"Mode: {mode}\n"
+			f"News:\n{payload.news_text}"
+		)
+	else:
+		prompt = (
+			"Explain the following news in the selected mode:\n"
+			"- Student: educational and clear\n"
+			"- Professional: detailed and technical\n\n"
+			f"Language instruction: {language_instruction}\n"
+			f"Mode: {mode}\n"
+			f"News:\n{payload.news_text}"
+		)
 	explanation = call_llm(prompt)
 	return {
 		"mode": mode,
