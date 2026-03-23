@@ -16,9 +16,8 @@ from pydantic import BaseModel, Field
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 TEMPLATES_DIR = BASE_DIR / "templates"
-AUDIO_DIR = STATIC_DIR / "audio"
-
-STATIC_DIR.mkdir(exist_ok=True)
+# Use a writable location for generated audio (Vercel /tmp in serverless)
+AUDIO_DIR = Path(os.getenv("AUDIO_DIR", "/tmp/newsroom-audio"))
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="AI-Native Interactive News Platform")
@@ -362,6 +361,24 @@ def voice(payload: VoiceInput) -> dict[str, str]:
 		tts = gTTS(text=payload.text, lang=voice_lang)
 		tts.save(str(file_path))
 
-		return {"audio_url": f"/static/audio/{file_name}", "language": voice_lang}
+		return {"audio_url": f"/audio/{file_name}", "language": voice_lang}
 	except Exception as exc:
 		raise HTTPException(status_code=500, detail=f"Voice generation failed: {exc}") from exc
+
+
+@app.get("/audio/{file_name}")
+def get_audio(file_name: str) -> FileResponse:
+	lower_name = file_name.lower()
+	if any(sep in file_name for sep in ("/", "\\")) or "%2f" in lower_name or "%5c" in lower_name:
+		raise HTTPException(status_code=400, detail="Invalid file name")
+	if not re.fullmatch(r"voice_[a-f0-9]{32}\.mp3", file_name):
+		raise HTTPException(status_code=400, detail="Invalid file name format")
+
+	file_path = (AUDIO_DIR / file_name).resolve()
+	audio_root = AUDIO_DIR.resolve()
+	if not file_path.is_relative_to(audio_root):
+		raise HTTPException(status_code=400, detail="Invalid file path")
+	if not file_path.exists():
+		raise HTTPException(status_code=404, detail="Audio file not found")
+
+	return FileResponse(file_path, media_type="audio/mpeg")
