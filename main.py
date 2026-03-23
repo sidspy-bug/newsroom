@@ -376,7 +376,7 @@ def get_audio(file_name: str) -> FileResponse:
 
 	file_path = (AUDIO_DIR / file_name).resolve()
 	audio_root = AUDIO_DIR.resolve()
-	if audio_root not in file_path.parents and audio_root != file_path:
+	if not file_path.is_relative_to(audio_root):
 		raise HTTPException(status_code=400, detail="Invalid file path")
 	if not file_path.exists():
 		raise HTTPException(status_code=404, detail="Audio file not found")
