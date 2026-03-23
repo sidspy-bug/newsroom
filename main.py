@@ -351,7 +351,6 @@ def explain(payload: ExplainInput) -> dict[str, str]:
 	else:
 		prompt = (
 			"Explain the following news in the selected mode:\n"
-			"- Kid: very simple with examples\n"
 			"- Student: educational and clear\n"
 			"- Professional: detailed and technical\n\n"
 			f"Language instruction: {language_instruction}\n"
