@@ -22,7 +22,12 @@ const statusEl = document.getElementById("status");
 const wordCountEl = document.getElementById("wordCount");
 const readTimeEl = document.getElementById("readTime");
 const selectedModeEl = document.getElementById("selectedMode");
-const outputLanguage = document.getElementById("outputLanguage");
+// Custom language dropdown
+const langDropdownWrap = document.getElementById("langDropdownWrap");
+const langDropdownBtn = document.getElementById("langDropdownBtn");
+const langDropdownPanel = document.getElementById("langDropdownPanel");
+const langSelectedText = document.getElementById("langSelectedText");
+let currentOutputLanguage = "english";
 const openCameraBtn = document.getElementById("openCameraBtn");
 const scanCameraOption = document.getElementById("scanCameraOption");
 const uploadPhotoOption = document.getElementById("uploadPhotoOption");
@@ -459,6 +464,67 @@ function toggleCameraQuickOptions() {
   openCameraBtn.setAttribute("aria-expanded", "true");
 }
 
+// ========== CUSTOM LANGUAGE DROPDOWN ==========
+function openLangDropdown() {
+  if (!langDropdownWrap || !langDropdownBtn) return;
+  langDropdownWrap.dataset.open = "true";
+  langDropdownBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeLangDropdown() {
+  if (!langDropdownWrap || !langDropdownBtn) return;
+  langDropdownWrap.dataset.open = "false";
+  langDropdownBtn.setAttribute("aria-expanded", "false");
+}
+
+function toggleLangDropdown() {
+  if (langDropdownWrap?.dataset.open === "true") {
+    closeLangDropdown();
+  } else {
+    openLangDropdown();
+  }
+}
+
+function selectLangOption(value, label) {
+  currentOutputLanguage = value;
+  if (langSelectedText) langSelectedText.textContent = label;
+  document.querySelectorAll(".lang-option").forEach((el) => {
+    const active = el.dataset.value === value;
+    el.classList.toggle("lang-option-active", active);
+    el.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  closeLangDropdown();
+}
+
+if (langDropdownBtn) {
+  langDropdownBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleLangDropdown();
+  });
+}
+
+if (langDropdownPanel) {
+  langDropdownPanel.addEventListener("click", (e) => {
+    const option = e.target.closest(".lang-option");
+    if (!option) return;
+    const value = option.dataset.value;
+    selectLangOption(value, option.textContent.trim());
+  });
+}
+
+document.addEventListener("click", (e) => {
+  if (langDropdownWrap && !langDropdownWrap.contains(e.target)) {
+    closeLangDropdown();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && langDropdownWrap?.dataset.open === "true") {
+    closeLangDropdown();
+    langDropdownBtn?.focus();
+  }
+});
+
 function appendChatBubble(text, role) {
   if (!chatWindow) return;
 
@@ -551,12 +617,11 @@ async function postJSON(url, payload) {
 }
 
 function selectedLanguage() {
-  const value = outputLanguage?.value?.trim().toLowerCase();
-  return value && value !== "auto" ? value : null;
+  return currentOutputLanguage || null;
 }
 
 function selectedLanguageRaw() {
-  return outputLanguage?.value?.trim().toLowerCase() || "auto";
+  return currentOutputLanguage || "english";
 }
 
 async function extractTextFromImage(source) {
@@ -724,7 +789,7 @@ async function playNarration(text, silentStatus = false) {
     if (!silentStatus) setStatus("Generating voice...", "loading");
     const data = await postJSON("/voice", {
       text,
-      language: selectedLanguageRaw() === "auto" ? latestResponseLanguage : selectedLanguageRaw(),
+      language: selectedLanguageRaw(),
     });
     audioPlayer.src = data.audio_url;
     const started = await audioPlayer.play().then(() => true).catch(() => false);
@@ -777,7 +842,7 @@ async function playSummaryAudio(text) {
     
     const data = await postJSON("/voice", {
       text,
-      language: selectedLanguageRaw() === "auto" ? latestResponseLanguage : selectedLanguageRaw(),
+      language: selectedLanguageRaw(),
     });
     
     summaryAudioPlayer.src = data.audio_url;
@@ -836,7 +901,7 @@ async function playExplanationAudio(text) {
     
     const data = await postJSON("/voice", {
       text,
-      language: selectedLanguageRaw() === "auto" ? latestResponseLanguage : selectedLanguageRaw(),
+      language: selectedLanguageRaw(),
     });
     
     explanationAudioPlayer.src = data.audio_url;

@@ -103,20 +103,23 @@
               <button id="uploadPhotoOption" class="btn camera-option-btn camera-option-upload" type="button">🖼️ Upload Photo</button>
             </div>
           </div>
-          <label class="lang-mini-wrap" for="outputLanguage" aria-label="Output language">
+          <div class="lang-mini-wrap lang-dropdown-wrap" id="langDropdownWrap">
             <span class="lang-mini-icon" aria-hidden="true">🌐</span>
-            <span class="lang-mini-label">Language</span>
-            <select id="outputLanguage" class="lang-mini-select">
-              <option value="auto" selected>Auto</option>
-              <option value="english">English</option>
-              <option value="hindi">Hindi</option>
-              <option value="spanish">Spanish</option>
-              <option value="french">French</option>
-              <option value="german">German</option>
-              <option value="japanese">Japanese</option>
-              <option value="arabic">Arabic</option>
-            </select>
-          </label>
+            <button class="lang-dropdown-btn" id="langDropdownBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Select output language">
+              <span class="lang-mini-label">Language</span>
+              <span class="lang-selected-text" id="langSelectedText">🇬🇧 English</span>
+              <span class="lang-dropdown-caret" aria-hidden="true">▾</span>
+            </button>
+            <ul class="lang-dropdown-panel" id="langDropdownPanel" role="listbox" aria-label="Output language">
+              <li class="lang-option lang-option-active" data-value="english" role="option" aria-selected="true">🇬🇧 English</li>
+              <li class="lang-option" data-value="hindi" role="option" aria-selected="false">🇮🇳 Hindi</li>
+              <li class="lang-option" data-value="spanish" role="option" aria-selected="false">🇪🇸 Spanish</li>
+              <li class="lang-option" data-value="french" role="option" aria-selected="false">🇫🇷 French</li>
+              <li class="lang-option" data-value="german" role="option" aria-selected="false">🇩🇪 German</li>
+              <li class="lang-option" data-value="japanese" role="option" aria-selected="false">🇯🇵 Japanese</li>
+              <li class="lang-option" data-value="arabic" role="option" aria-selected="false">🇸🇦 Arabic</li>
+            </ul>
+          </div>
         </div>
       </div>
       <textarea id="newsText" placeholder="Enter or paste news article here..."></textarea>
