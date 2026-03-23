@@ -168,3 +168,4 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
 - `vercel.json` routes all traffic (including `/static/**`) to `main.py` so the FastAPI app serves both UI and APIs.
 - Install dependencies from `requirements.txt` so Vercel's Python runtime has FastAPI and supporting packages.
 - Set the `GROQ_API_KEY` **environment variable** in your Vercel project (Dashboard → Settings → Environment Variables). `.env` files are not uploaded, so the API key must be provided as a deployed env var.
+- **See the updated version:** After pushing a commit or opening a PR, Vercel creates a Preview deployment. Open your Vercel project → Deployments tab and click the latest preview URL (also linked from the GitHub PR/commit checks). For production, merge to the production branch or promote the preview using “Promote to Production”; Vercel will attach the production URL once the deployment finishes.
