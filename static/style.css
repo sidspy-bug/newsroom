@@ -1579,12 +1579,12 @@ body.mode-student {
   --bg: #e8f4f8 !important;
   --bg-soft: #f0f9fc !important;
   --card: #ffffff !important;
-  --text: #1a5f7a !important;
-  --muted: #4a8fa3 !important;
-  --primary-a: #0084d0 !important;
-  --primary-b: #00d4ff !important;
-  --ok: #47dbab !important;
-  --error: #ff7e9c !important;
+  --text: #1a4a60 !important;
+  --muted: #3a7a96 !important;
+  --primary-a: #0077c0 !important;
+  --primary-b: #00b8d9 !important;
+  --ok: #1f9e76 !important;
+  --error: #d93025 !important;
   font-size: 110% !important;
   background: linear-gradient(160deg, #f0f9fc, #e8f4f8) !important;
 }
@@ -1595,27 +1595,138 @@ body.mode-student * {
 
 body.mode-student .neo-card {
   border-radius: 16px;
-  box-shadow:
-    0 8px 16px rgba(0, 132, 208, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -8px 16px rgba(0, 84, 132, 0.08);
+  background: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 100, 160, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
   animation: fadeInStudent 0.4s ease-out;
 }
 
+body.mode-student textarea,
+body.mode-student input,
+body.mode-student select {
+  background: #f4fafd !important;
+  color: #1a4a60 !important;
+  border-color: rgba(0, 132, 208, 0.3) !important;
+  box-shadow: inset 0 1px 4px rgba(0, 100, 160, 0.08) !important;
+}
+
+body.mode-student textarea:focus,
+body.mode-student input:focus,
+body.mode-student select:focus {
+  border-color: #0077c0 !important;
+  box-shadow:
+    0 0 0 3px rgba(0, 119, 192, 0.18),
+    inset 0 1px 4px rgba(0, 100, 160, 0.08) !important;
+}
+
+body.mode-student .output {
+  background: #f4fafd !important;
+  color: #1a4a60 !important;
+  border-color: rgba(0, 132, 208, 0.2) !important;
+  box-shadow: inset 0 1px 4px rgba(0, 100, 160, 0.08) !important;
+}
+
+body.mode-student .status {
+  background: #eaf5fb !important;
+  border-color: rgba(0, 132, 208, 0.2) !important;
+  box-shadow: inset 0 1px 4px rgba(0, 100, 160, 0.06) !important;
+}
+
+body.mode-student .status-loading {
+  color: #0077c0 !important;
+}
+
 body.mode-student .btn {
+  box-shadow: 0 4px 12px rgba(0, 100, 160, 0.2) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.mode-student .btn:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 100, 160, 0.28) !important;
+}
+
+body.mode-student .btn-ghost {
+  background: #dff0fa !important;
+  color: #1a4a60 !important;
+  box-shadow: 0 2px 8px rgba(0, 100, 160, 0.12) !important;
+}
+
+body.mode-student .btn-ghost:hover {
+  background: #cce9f5 !important;
+}
+
+body.mode-student .mode-btn {
+  background: linear-gradient(145deg, #0084d0, #00a8cc) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(0, 100, 160, 0.25) !important;
+}
+
+body.mode-student .tabs-container {
+  background: rgba(220, 240, 250, 0.7) !important;
+  border-color: rgba(0, 132, 208, 0.15) !important;
+}
+
+body.mode-student .tab-btn {
+  background: rgba(200, 230, 245, 0.6) !important;
+  border-color: rgba(0, 132, 208, 0.2) !important;
+  color: #3a7a96 !important;
+}
+
+body.mode-student .tab-btn:hover {
+  background: rgba(0, 132, 208, 0.12) !important;
+  border-color: rgba(0, 132, 208, 0.35) !important;
+  color: #1a4a60 !important;
+}
+
+body.mode-student .tab-btn.active {
+  background: linear-gradient(135deg, #0077c0, #00a8cc) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
 }
 
 body.mode-student .chat-bubble {
   animation: slideInStudent 0.3s ease-out;
 }
 
+body.mode-student .chat-bubble.ai {
+  background: #dff0fa !important;
+  color: #1a4a60 !important;
+}
+
+body.mode-student .chat-bubble.user {
+  background: linear-gradient(130deg, #0077c0, #00a8cc) !important;
+  color: #ffffff !important;
+}
+
+body.mode-student .typing-dots span {
+  background: #0077c0 !important;
+  opacity: 0.6 !important;
+}
+
+body.mode-student .user-type-panel {
+  background: linear-gradient(135deg, #ffffff 0%, #eaf5fb 100%) !important;
+  box-shadow: 0 12px 40px rgba(0, 100, 160, 0.15) !important;
+  border-color: rgba(0, 132, 208, 0.2) !important;
+}
+
+body.mode-student .camera-quick-options {
+  background: rgba(240, 249, 252, 0.97) !important;
+  border-color: rgba(0, 132, 208, 0.25) !important;
+  box-shadow: 0 8px 20px rgba(0, 100, 160, 0.15) !important;
+}
+
+body.mode-student .camera-option-btn {
+  background: linear-gradient(135deg, rgba(0, 132, 208, 0.15), rgba(0, 168, 204, 0.1)) !important;
+  border-color: rgba(0, 132, 208, 0.3) !important;
+  color: #1a4a60 !important;
+}
+
 body.mode-student #explanationOutput {
   animation: fadeInStudent 0.4s ease-out;
+}
+
+body.mode-student .ocr-helper {
+  color: #3a7a96 !important;
 }
 
 /* PROFESSIONAL MODE - Minimal, Serious, Efficient */
