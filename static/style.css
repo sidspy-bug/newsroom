@@ -32,7 +32,16 @@ body {
 }
 
 body.mode-kid {
-  color: #2b1c04;
+  --bg: #fff3d7;
+  --bg-soft: #ffe6b3;
+  --card: #fff9e6;
+  --text: #2b1c04;
+  --muted: #5b3b07;
+  --primary-a: #f59e0b;
+  --primary-b: #f97316;
+  --ok: #2f8f46;
+  --error: #c53030;
+  color: var(--text);
   background:
     radial-gradient(circle at 20% 25%, #ffd36f 0%, #ffd36f 14%, #ffeb99 14%, #ffeb99 18%, transparent 18%),
     radial-gradient(circle at 74% 18%, #ff9ec7 0%, #ff9ec7 12%, #ffd6e8 12%, #ffd6e8 16%, transparent 16%),
