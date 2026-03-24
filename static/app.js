@@ -694,12 +694,31 @@ async function captureAndExtract() {
 }
 
 summarizeBtn.addEventListener("click", async () => {
-  const text = newsText.value.trim();
+  let text = newsText.value.trim();
   const mode = userType || activeMode || "student";
-  if (!text) return setStatus("Please paste news text first.", "error");
 
   try {
     setButtonLoading(summarizeBtn, true, "Generating...");
+    if (!text) {
+      setStatus("No input found. Fetching latest news...", "loading");
+      let fetched;
+      try {
+        fetched = await postJSON("/news/fetch", {
+          query: "latest",
+          page_size: 5,
+          language: "en",
+        });
+      } catch (err) {
+        throw new Error(`News fetch failed: ${err.message}`);
+      }
+      text = (fetched.news_text || "").trim();
+      if (!text) {
+        throw new Error("Unable to fetch news articles. Please try again or enter text manually.");
+      }
+      newsText.value = text;
+      updateStats();
+    }
+
     setStatus("Generating summary and explanation...", "loading");
     setActiveMode(mode);
 
