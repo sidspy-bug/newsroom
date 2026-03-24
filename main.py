@@ -1,10 +1,7 @@
 import os
 import re
-import socket
-import ipaddress
 from pathlib import Path
 from typing import Optional
-from urllib.parse import urlparse
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
@@ -266,10 +263,6 @@ class FetchNewsInput(BaseModel):
 	language: Optional[str] = Field(default="en", min_length=2, max_length=10)
 
 
-class FetchNewsUrlInput(BaseModel):
-	url: str = Field(..., min_length=10, max_length=2000)
-
-
 KID_RESTRICTED_PATTERNS = [
 	r"\b(behead(?:ed|ing)?|decapitat(?:e|ed|ion))\b",
 	r"\b(dismember(?:ed|ment)?|mutilat(?:e|ed|ion))\b",
@@ -335,71 +328,6 @@ def build_chat_behavior_instruction(mode: str) -> str:
 			"Use a professional, precise tone with clear reasoning and practical depth."
 		)
 	return "Use a clear, neutral tone with concise and practical explanations."
-
-
-def _is_public_ip(ip_text: str) -> bool:
-	try:
-		ip_obj = ipaddress.ip_address(ip_text)
-	except ValueError:
-		return False
-
-	return not (
-		ip_obj.is_private
-		or ip_obj.is_loopback
-		or ip_obj.is_link_local
-		or ip_obj.is_multicast
-		or ip_obj.is_reserved
-		or ip_obj.is_unspecified
-	)
-
-
-def _is_public_http_url(url: str) -> bool:
-	parsed = urlparse(url)
-	if parsed.scheme not in {"http", "https"}:
-		return False
-	hostname = (parsed.hostname or "").strip().lower()
-	if not hostname:
-		return False
-	if hostname in {"localhost"} or hostname.endswith(".local"):
-		return False
-
-	try:
-		ipaddress.ip_address(hostname)
-		return _is_public_ip(hostname)
-	except ValueError:
-		pass
-
-	try:
-		addr_info = socket.getaddrinfo(hostname, None)
-	except socket.gaierror:
-		return False
-	except OSError:
-		return False
-
-	resolved_ips = {entry[4][0] for entry in addr_info if entry and entry[4]}
-	if not resolved_ips:
-		return False
-	return all(_is_public_ip(ip) for ip in resolved_ips)
-
-
-def _extract_article_text_from_html(html: str) -> tuple[str, str]:
-	title_match = re.search(r"<title[^>]*>(.*?)</title>", html, flags=re.IGNORECASE | re.DOTALL)
-	title = re.sub(r"\s+", " ", title_match.group(1)).strip() if title_match else ""
-
-	paragraphs = re.findall(r"<p\b[^>]*>(.*?)</p>", html, flags=re.IGNORECASE | re.DOTALL)
-	cleaned_paragraphs: list[str] = []
-	for raw in paragraphs:
-		text = re.sub(r"<[^>]+>", " ", raw)
-		text = re.sub(r"&nbsp;|&#160;", " ", text, flags=re.IGNORECASE)
-		text = re.sub(r"&amp;", "&", text, flags=re.IGNORECASE)
-		text = re.sub(r"&quot;|&#34;", "\"", text, flags=re.IGNORECASE)
-		text = re.sub(r"&#39;|&apos;", "'", text, flags=re.IGNORECASE)
-		text = re.sub(r"\s+", " ", text).strip()
-		if len(text) >= 40:
-			cleaned_paragraphs.append(text)
-
-	article_text = "\n\n".join(cleaned_paragraphs[:30]).strip()
-	return title, article_text
 
 
 @app.get("/")
@@ -500,52 +428,6 @@ def fetch_news(payload: FetchNewsInput) -> dict[str, str | int]:
 		"news_text": combined_news,
 		"articles_count": len(formatted_articles),
 	}
-
-
-@app.post("/news/fetch-url")
-def fetch_news_url(payload: FetchNewsUrlInput) -> dict[str, str]:
-	url = payload.url.strip()
-	if not _is_public_http_url(url):
-		raise HTTPException(
-			status_code=400,
-			detail="Only public http/https news article URLs are allowed.",
-		)
-
-	headers = {
-		"User-Agent": (
-			"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-			"(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-		)
-	}
-	try:
-		resp = requests.get(url, headers=headers, timeout=20, allow_redirects=True)
-	except requests.RequestException as exc:
-		raise HTTPException(status_code=500, detail=f"Article fetch failed: {exc}") from exc
-
-	if not _is_public_http_url(resp.url):
-		raise HTTPException(
-			status_code=400,
-			detail="Redirect target is not an allowed public http/https URL.",
-		)
-
-	if resp.status_code >= 400:
-		raise HTTPException(status_code=400, detail=f"Article URL request failed with status {resp.status_code}.")
-
-	content_type = (resp.headers.get("content-type") or "").lower()
-	if "text/html" not in content_type:
-		raise HTTPException(status_code=400, detail="URL did not return an HTML article page.")
-
-	html = resp.text or ""
-	title, article_text = _extract_article_text_from_html(html)
-	if len(article_text) < 120:
-		raise HTTPException(
-			status_code=422,
-			detail="Could not extract enough readable article text from this URL. Please paste the news text manually.",
-		)
-
-	source = urlparse(resp.url).hostname or urlparse(url).hostname or ""
-	prefix = f"Title: {title}\nSource: {source}\n\n" if title else f"Source: {source}\n\n"
-	return {"news_text": f"{prefix}{article_text}".strip(), "source_url": resp.url}
 
 
 @app.post("/summarize")

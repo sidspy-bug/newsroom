@@ -123,21 +123,6 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
   }
   ```
 
-### `POST /news/fetch-url`
-- Input:
-  ```json
-  {
-    "url": "https://example.com/news/article"
-  }
-  ```
-- Output:
-  ```json
-  {
-    "news_text": "Title: ...\nSource: ...\n\nExtracted article text...",
-    "source_url": "https://example.com/news/article"
-  }
-  ```
-
 ### `POST /explain`
 - Input:
   ```json
@@ -196,7 +181,7 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
 ## ⚠️ Notes
 - If `GROQ_API_KEY` is missing/invalid, AI endpoints return clear error details.
 - If `NEWS_API_KEY` is missing/invalid, `/news/fetch` returns clear error details.
-- If the input box contains only one `http/https` link, the app auto-fetches and extracts article text using `/news/fetch-url` before generating summary/explanation.
+- If the input box contains only one `http/https` link, the app auto-fetches and extracts article text via the public `r.jina.ai` reader service in the browser before generating summary/explanation.
 - Some IDE warnings about missing imports happen when interpreter is not set to project `.venv`.
 - Kid safety filter is pattern-based and intentionally conservative.
 
