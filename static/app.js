@@ -727,7 +727,7 @@ summarizeBtn.addEventListener("click", async () => {
       updateStats();
     } else {
       const articleUrl = extractSingleHttpUrl(text);
-      if (articleUrl && text === articleUrl) {
+      if (articleUrl) {
         setStatus("Fetching article from URL...", "loading");
         const fetchedByUrl = await postJSON("/news/fetch-url", { url: articleUrl });
         text = (fetchedByUrl.news_text || "").trim();
