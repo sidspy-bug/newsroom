@@ -605,7 +605,9 @@ select:focus {
 
 .tab-btn {
   display: inline-flex;
+  flex: 1 1 0;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 16px;
   border: 1px solid rgba(136, 166, 255, 0.2);
@@ -634,7 +636,6 @@ select:focus {
 .tab-btn:hover {
   background: linear-gradient(135deg, rgba(95, 120, 255, 0.15), rgba(139, 92, 246, 0.1));
   border-color: rgba(145, 175, 255, 0.4);
-  transform: translateY(-2px);
   color: var(--text);
 }
 
@@ -647,7 +648,6 @@ select:focus {
   border-color: rgba(157, 197, 255, 0.8);
   color: white;
   box-shadow: 0 8px 24px rgba(95, 120, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(-3px);
 }
 
 .tab-icon {

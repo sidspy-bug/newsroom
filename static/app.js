@@ -596,7 +596,7 @@ function setActiveMode(mode) {
   selectedModeEl.textContent = mode ? mode[0].toUpperCase() + mode.slice(1) : "None";
   
   // Apply adaptive UI mode to body
-  document.body.classList.remove("mode-child", "mode-student", "mode-professional");
+  document.body.classList.remove("mode-kid", "mode-child", "mode-student", "mode-professional");
   if (mode) {
     document.body.classList.add(`mode-${mode}`);
   }
@@ -1050,7 +1050,7 @@ function setUserType(type) {
   });
   
   // Apply user type theme to body
-  document.body.classList.remove("mode-child", "mode-student", "mode-professional");
+  document.body.classList.remove("mode-kid", "mode-child", "mode-student", "mode-professional");
   document.body.classList.add(`mode-${type}`);
   setActiveMode(type);
   applyProfileContent(type);
