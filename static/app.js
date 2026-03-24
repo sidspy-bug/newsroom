@@ -624,6 +624,14 @@ function selectedLanguageRaw() {
   return currentOutputLanguage || "english";
 }
 
+function extractSingleHttpUrl(text) {
+  const trimmed = String(text || "").trim();
+  if (!trimmed) return null;
+  const matches = trimmed.match(/https?:\/\/[^\s]+/gi) || [];
+  if (matches.length !== 1) return null;
+  return matches[0];
+}
+
 async function extractTextFromImage(source) {
   if (!window.Tesseract) {
     throw new Error("OCR library not loaded. Refresh and try again.");
@@ -717,6 +725,18 @@ summarizeBtn.addEventListener("click", async () => {
       }
       newsText.value = text;
       updateStats();
+    } else {
+      const articleUrl = extractSingleHttpUrl(text);
+      if (articleUrl && text === articleUrl) {
+        setStatus("Fetching article from URL...", "loading");
+        const fetchedByUrl = await postJSON("/news/fetch-url", { url: articleUrl });
+        text = (fetchedByUrl.news_text || "").trim();
+        if (!text) {
+          throw new Error("Unable to extract article text from URL.");
+        }
+        newsText.value = text;
+        updateStats();
+      }
     }
 
     setStatus("Generating summary and explanation...", "loading");
