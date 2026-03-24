@@ -127,6 +127,13 @@ def get_groq_api_key() -> Optional[str]:
 	return api_key
 
 
+def get_news_api_key() -> Optional[str]:
+	api_key = os.getenv("NEWS_API_KEY")
+	if not api_key:
+		api_key = _read_env_file_key(BASE_DIR / ".env", "NEWS_API_KEY")
+	return api_key
+
+
 def call_groq(prompt: str) -> str:
 	api_key = get_groq_api_key()
 	if not api_key:
@@ -232,6 +239,12 @@ class VoiceInput(BaseModel):
 	language: Optional[str] = Field(default="english")
 
 
+class FetchNewsInput(BaseModel):
+	query: Optional[str] = Field(default="latest", max_length=120)
+	page_size: int = Field(default=5, ge=1, le=10)
+	language: Optional[str] = Field(default="en", max_length=10)
+
+
 KID_RESTRICTED_PATTERNS = [
 	r"\b(behead(?:ed|ing)?|decapitat(?:e|ed|ion))\b",
 	r"\b(dismember(?:ed|ment)?|mutilat(?:e|ed|ion))\b",
@@ -307,6 +320,87 @@ def index() -> FileResponse:
 @app.get("/health")
 def health() -> dict[str, str]:
 	return {"status": "ok"}
+
+
+@app.post("/news/fetch")
+def fetch_news(payload: FetchNewsInput) -> dict[str, str | int]:
+	api_key = get_news_api_key()
+	if not api_key:
+		raise HTTPException(
+			status_code=400,
+			detail="NEWS_API_KEY is not set. Add NEWS_API_KEY in environment or .env file.",
+		)
+
+	params: dict[str, str | int] = {
+		"apiKey": api_key,
+		"pageSize": payload.page_size,
+	}
+	query = (payload.query or "").strip()
+	if query and query.lower() not in {"latest", "top", "headlines"}:
+		params["q"] = query
+	language = (payload.language or "").strip().lower()
+	if language:
+		params["language"] = language[:2]
+
+	try:
+		resp = requests.get(
+			"https://newsapi.org/v2/top-headlines",
+			params=params,
+			timeout=20,
+		)
+	except requests.RequestException as exc:
+		raise HTTPException(status_code=500, detail=f"News API network error: {exc}") from exc
+
+	if resp.status_code == 401 or resp.status_code == 403:
+		raise HTTPException(
+			status_code=401,
+			detail="Invalid NEWS_API_KEY. Create a new NewsAPI key and update your environment.",
+		)
+	if resp.status_code == 429:
+		raise HTTPException(
+			status_code=429,
+			detail="News API rate limit exceeded. Please retry later.",
+		)
+	if resp.status_code >= 400:
+		raise HTTPException(status_code=500, detail=f"News API request failed: {resp.text}")
+
+	data = resp.json()
+	if data.get("status") != "ok":
+		raise HTTPException(
+			status_code=500,
+			detail=f"News API error: {data.get('message') or 'Unknown error'}",
+		)
+
+	articles = data.get("articles") or []
+	formatted_articles: list[str] = []
+	for article in articles:
+		title = (article.get("title") or "").strip()
+		description = (article.get("description") or "").strip()
+		content = (article.get("content") or "").strip()
+		content = re.sub(r"\s*\[\+\d+\s+chars\]$", "", content).strip()
+		source = ((article.get("source") or {}).get("name") or "").strip()
+
+		parts = [part for part in [title, description, content] if part]
+		if not parts:
+			continue
+		body = " ".join(parts)
+		if source:
+			body = f"{body} (Source: {source})"
+		formatted_articles.append(body)
+
+	if not formatted_articles:
+		raise HTTPException(
+			status_code=404,
+			detail="No news articles found for the requested filters.",
+		)
+
+	combined_news = "\n\n".join(
+		f"Article {index + 1}: {text}" for index, text in enumerate(formatted_articles)
+	)
+	return {
+		"news_text": combined_news,
+		"articles_count": len(formatted_articles),
+	}
 
 
 @app.post("/summarize")

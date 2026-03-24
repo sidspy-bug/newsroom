@@ -694,12 +694,26 @@ async function captureAndExtract() {
 }
 
 summarizeBtn.addEventListener("click", async () => {
-  const text = newsText.value.trim();
+  let text = newsText.value.trim();
   const mode = userType || activeMode || "student";
-  if (!text) return setStatus("Please paste news text first.", "error");
 
   try {
     setButtonLoading(summarizeBtn, true, "Generating...");
+    if (!text) {
+      setStatus("No input found. Fetching latest news...", "loading");
+      const fetched = await postJSON("/news/fetch", {
+        query: "latest",
+        page_size: 5,
+        language: "en",
+      });
+      text = (fetched.news_text || "").trim();
+      if (!text) {
+        throw new Error("News fetch returned empty content.");
+      }
+      newsText.value = text;
+      updateStats();
+    }
+
     setStatus("Generating summary and explanation...", "loading");
     setActiveMode(mode);
 

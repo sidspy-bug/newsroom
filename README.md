@@ -67,11 +67,13 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
 2. Install dependencies:
    - `pip install fastapi uvicorn gtts requests`
 
-3. Configure API key:
+3. Configure API keys:
    - Option A (env var):
-     - `$env:GROQ_API_KEY="your_api_key_here"`
+      - `$env:GROQ_API_KEY="your_api_key_here"`
+      - `$env:NEWS_API_KEY="your_news_api_key_here"`
    - Option B (`.env` file in project root):
-     - `GROQ_API_KEY=your_api_key_here`
+      - `GROQ_API_KEY=your_api_key_here`
+      - `NEWS_API_KEY=your_news_api_key_here`
 
 4. Run app:
    - `uvicorn main:app --reload`
@@ -101,6 +103,23 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
   {
     "summary": "...",
     "language": "en"
+  }
+  ```
+
+### `POST /news/fetch`
+- Input:
+  ```json
+  {
+    "query": "latest",
+    "page_size": 5,
+    "language": "en"
+  }
+  ```
+- Output:
+  ```json
+  {
+    "news_text": "Article 1: ...\n\nArticle 2: ...",
+    "articles_count": 5
   }
   ```
 
@@ -161,10 +180,11 @@ AI-powered, mobile-first news understanding app with adaptive UI for different u
 
 ## ⚠️ Notes
 - If `GROQ_API_KEY` is missing/invalid, AI endpoints return clear error details.
+- If `NEWS_API_KEY` is missing/invalid, `/news/fetch` returns clear error details.
 - Some IDE warnings about missing imports happen when interpreter is not set to project `.venv`.
 - Kid safety filter is pattern-based and intentionally conservative.
 
 ## ▲ Vercel Deployment
 - `vercel.json` routes all traffic (including `/static/**`) to `main.py` so the FastAPI app serves both UI and APIs.
 - Install dependencies from `requirements.txt` so Vercel's Python runtime has FastAPI and supporting packages.
-- Set the `GROQ_API_KEY` **environment variable** in your Vercel project (Dashboard → Settings → Environment Variables). `.env` files are not uploaded, so the API key must be provided as a deployed env var.
+- Set `GROQ_API_KEY` and `NEWS_API_KEY` **environment variables** in your Vercel project (Dashboard → Settings → Environment Variables). `.env` files are not uploaded, so API keys must be provided as deployed env vars.
