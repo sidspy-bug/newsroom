@@ -284,6 +284,21 @@ def enforce_kid_safety(mode: str, news_text: str) -> None:
 		)
 
 
+def build_chat_behavior_instruction(mode: str) -> str:
+	if mode == "kid":
+		return (
+			"Use a gentle, kid-friendly tone with short, clear sentences. "
+			"Avoid scary, graphic, or explicit details."
+		)
+	if mode == "student":
+		return "Use a clear, educational tone with simple explanations."
+	if mode == "professional":
+		return (
+			"Use a professional, precise tone with clear reasoning and practical depth."
+		)
+	return "Use a clear, neutral tone with concise and practical explanations."
+
+
 @app.get("/")
 def index() -> FileResponse:
 	return FileResponse(TEMPLATES_DIR / "index.html")
@@ -386,10 +401,15 @@ def chat(payload: ChatInput) -> dict[str, str]:
 			continue
 		history_lines.append(f"{role}: {turn.message}")
 	history_text = "\n".join(history_lines) if history_lines else "(no previous chat)"
+	behavior_instruction = build_chat_behavior_instruction(mode)
 
 	prompt = (
-		"Answer the question based only on the given news. "
-		"Use short, clear responses. If not related, say you don't know.\n\n"
+		"You are a helpful news assistant that can also answer broader questions. "
+		"Prioritize the given news when the question is related to it. "
+		"If the question is broader or not directly covered by the news, provide a useful general answer. "
+		"State clearly when you are using general knowledge instead of the provided news. "
+		"If uncertain, say what is uncertain instead of inventing facts.\n\n"
+		f"Style instruction: {behavior_instruction}\n"
 		f"Language instruction: {language_instruction}\n\n"
 		f"News:\n{payload.news_text}\n\n"
 		f"Previous chat context:\n{history_text}\n\n"
