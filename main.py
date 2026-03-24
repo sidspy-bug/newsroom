@@ -85,6 +85,24 @@ LANGUAGE_LABELS = {
 	"it": "Italian",
 }
 
+NEWSAPI_SUPPORTED_LANGUAGE_CODES = {
+	"ar",
+	"de",
+	"en",
+	"es",
+	"fr",
+	"he",
+	"it",
+	"nl",
+	"no",
+	"pt",
+	"ru",
+	"sv",
+	"ur",
+	"zh",
+}
+NEWSAPI_TRUNCATION_SUFFIX_PATTERN = r"\s*\[\+\d+\s+chars\]$"
+
 
 def normalize_language(language: Optional[str]) -> Optional[str]:
 	if not language:
@@ -242,7 +260,7 @@ class VoiceInput(BaseModel):
 class FetchNewsInput(BaseModel):
 	query: Optional[str] = Field(default="latest", max_length=120)
 	page_size: int = Field(default=5, ge=1, le=10)
-	language: Optional[str] = Field(default="en", max_length=10)
+	language: Optional[str] = Field(default="en", min_length=2, max_length=10)
 
 
 KID_RESTRICTED_PATTERNS = [
@@ -340,7 +358,15 @@ def fetch_news(payload: FetchNewsInput) -> dict[str, str | int]:
 		params["q"] = query
 	language = (payload.language or "").strip().lower()
 	if language:
-		params["language"] = language[:2]
+		if len(language) < 2:
+			raise HTTPException(status_code=400, detail="Language code must have at least 2 characters.")
+		language_code = language[:2]
+		if language_code not in NEWSAPI_SUPPORTED_LANGUAGE_CODES:
+			raise HTTPException(
+				status_code=400,
+				detail=f"Unsupported NewsAPI language code: {language_code}",
+			)
+		params["language"] = language_code
 
 	try:
 		resp = requests.get(
@@ -351,7 +377,7 @@ def fetch_news(payload: FetchNewsInput) -> dict[str, str | int]:
 	except requests.RequestException as exc:
 		raise HTTPException(status_code=500, detail=f"News API network error: {exc}") from exc
 
-	if resp.status_code == 401 or resp.status_code == 403:
+	if resp.status_code in (401, 403):
 		raise HTTPException(
 			status_code=401,
 			detail="Invalid NEWS_API_KEY. Create a new NewsAPI key and update your environment.",
@@ -377,7 +403,8 @@ def fetch_news(payload: FetchNewsInput) -> dict[str, str | int]:
 		title = (article.get("title") or "").strip()
 		description = (article.get("description") or "").strip()
 		content = (article.get("content") or "").strip()
-		content = re.sub(r"\s*\[\+\d+\s+chars\]$", "", content).strip()
+		# NewsAPI may append "[+123 chars]" to truncated content; remove this suffix.
+		content = re.sub(NEWSAPI_TRUNCATION_SUFFIX_PATTERN, "", content).strip()
 		source = ((article.get("source") or {}).get("name") or "").strip()
 
 		parts = [part for part in [title, description, content] if part]
