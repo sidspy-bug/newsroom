@@ -82,6 +82,10 @@ let chatNewsFingerprint = "";
 let audioCtx = null;
 let cameraStream = null;
 let morningQuoteIndex = 0;
+const ARTICLE_READER_ENDPOINT = "https://r.jina.ai/";
+const MIN_URL_ARTICLE_TEXT_LENGTH = 120;
+const MAX_URL_ARTICLE_TEXT_LENGTH = 14000;
+const URL_READER_SKIP_LINE_PATTERNS = [/^url source:/i, /^markdown content:/i];
 
 const DAY_QUOTES = {
   morning: [
@@ -624,6 +628,44 @@ function selectedLanguageRaw() {
   return currentOutputLanguage || "english";
 }
 
+function extractSingleHttpUrl(text) {
+  const trimmed = String(text || "").trim();
+  if (!trimmed) return null;
+  const matches = trimmed.match(/https?:\/\/[^\s]+/gi) || [];
+  if (matches.length !== 1) return null;
+  return matches[0];
+}
+
+async function fetchArticleTextFromUrl(url) {
+  const trimmed = String(url || "").trim();
+  if (!/^https?:\/\//i.test(trimmed)) {
+    throw new Error("Please provide a valid http/https news URL.");
+  }
+
+  const readerUrl = `${ARTICLE_READER_ENDPOINT}${trimmed}`;
+  const response = await fetch(readerUrl);
+  if (!response.ok) {
+    throw new Error(`Article fetch failed (${response.status}).`);
+  }
+
+  const raw = (await response.text()).trim();
+  if (!raw) {
+    throw new Error("Could not read text from the provided URL.");
+  }
+
+  const cleaned = raw
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter((line) => line && !URL_READER_SKIP_LINE_PATTERNS.some((pattern) => pattern.test(line)))
+    .join("\n\n")
+    .trim();
+
+  if (cleaned.length < MIN_URL_ARTICLE_TEXT_LENGTH) {
+    throw new Error("Could not extract enough article text from this URL. Please paste text manually.");
+  }
+  return cleaned.slice(0, MAX_URL_ARTICLE_TEXT_LENGTH);
+}
+
 async function extractTextFromImage(source) {
   if (!window.Tesseract) {
     throw new Error("OCR library not loaded. Refresh and try again.");
@@ -717,6 +759,17 @@ summarizeBtn.addEventListener("click", async () => {
       }
       newsText.value = text;
       updateStats();
+    } else {
+      const articleUrl = extractSingleHttpUrl(text);
+      if (articleUrl) {
+        setStatus("Fetching article from URL...", "loading");
+        text = await fetchArticleTextFromUrl(articleUrl);
+        if (!text) {
+          throw new Error("Unable to extract article text from URL.");
+        }
+        newsText.value = text;
+        updateStats();
+      }
     }
 
     setStatus("Generating summary and explanation...", "loading");
