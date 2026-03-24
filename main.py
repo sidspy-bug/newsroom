@@ -290,11 +290,13 @@ def build_chat_behavior_instruction(mode: str) -> str:
 			"Use a gentle, kid-friendly tone with short, clear sentences. "
 			"Avoid scary, graphic, or explicit details."
 		)
+	if mode == "student":
+		return "Use a clear, educational tone with simple explanations."
 	if mode == "professional":
 		return (
 			"Use a professional, precise tone with clear reasoning and practical depth."
 		)
-	return "Use a clear, educational tone with simple explanations."
+	return "Use a clear, neutral tone with concise and practical explanations."
 
 
 @app.get("/")
